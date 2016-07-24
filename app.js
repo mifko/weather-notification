@@ -1,12 +1,10 @@
-const fetch = require('node-fetch');
+﻿const fetch = require('node-fetch');
 const fs = require('fs');
 const moment = require('moment');
 const notifier = require('node-notifier');
 const path = require('path');
 const process = require('process');
 const weather = require('weather-js');
-
-process.argv.forEach(a => console.log(a));
 
 const weatherOptions = {
     search: process.argv.length && process.argv.length > 2 ? process.argv[2] : 'Bratislava',
@@ -17,8 +15,8 @@ const weatherOptions = {
 function displayWeatherInformation({ result, today, tomorrow, contentImage }) {
     notifier.notify({
         title: `${result[0].current.temperature}°${result[0].location.degreetype} - ${result[0].current.observationpoint}`,
-        subtitle: `${today.skytextday}, ${today.low}°${result[0].location.degreetype}-${today.high}°${result[0].location.degreetype}${today.precip ? `, ${today.precip}%` : ''}`,
-        message: `${tomorrow.skytextday}, ${tomorrow.low}°${result[0].location.degreetype}-${tomorrow.high}°${result[0].location.degreetype}${tomorrow.precip ? `, ${tomorrow.precip}%` : ''}`,
+        subtitle: `${today.formattedDate}: ${today.skytextday}, ${today.low}°${result[0].location.degreetype}-${today.high}°${result[0].location.degreetype}${today.precip ? `, ${today.precip}%` : ''}`,
+        message: `${tomorrow.formattedDate}: ${tomorrow.skytextday}, ${tomorrow.low}°${result[0].location.degreetype}-${tomorrow.high}°${result[0].location.degreetype}${tomorrow.precip ? `, ${tomorrow.precip}%` : ''}`,
         contentImage,
         open: `http://www.msn.com/en-us/weather/weathersearch?q=${result[0].location.name}&form=PRWKWB&mkt=en-us&httpsmsn=1&refig=0ac1ee17f2fd48fc875e1a54b1e8637c&savedegree=true&weadegreetype=C`
     }, (error, response) => {
@@ -75,7 +73,9 @@ weather.find(weatherOptions, (err, result) => {
     }
 
     let today = result[0].forecast.find(f => f.date == moment().format('YYYY-MM-DD'));
+    today.formattedDate = moment(today.date).locale(weatherOptions.lang).format('dddd');
     let tomorrow = result[0].forecast.find(f => f.date == moment().add(1, 'days').format('YYYY-MM-DD'));
+    tomorrow.formattedDate = moment(tomorrow.date).locale(weatherOptions.lang).format('dddd');
 
     fetch(`${result[0].location.imagerelativeurl}${today.skycodeday}.gif`)
         .then(res => getWeatherImage({ stream: res.body, id: today.skycodeday }))

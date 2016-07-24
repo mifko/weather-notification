@@ -4,7 +4,7 @@
   "description": "Weather notification tool",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "Michal Koci",
